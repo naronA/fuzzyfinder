@@ -1,14 +1,11 @@
 package main
 
-import "fmt"
-
 func LevenshteinDistance(str1, str2 string) int {
 	rowSize := len(str1) + 1
 	columnSize := len(str2) + 1
 	d := make([][]int, rowSize)
 	for i := 0; i < rowSize; i++ {
-		c := make([]int, columnSize)
-		d[i] = c
+		d[i] = make([]int, columnSize)
 	}
 
 	for i := 0; i < rowSize; i++ {
@@ -41,8 +38,4 @@ func LevenshteinDistance(str1, str2 string) int {
 		}
 	}
 	return d[rowSize-1][columnSize-1]
-}
-
-func main() {
-	fmt.Println(LevenshteinDistance("aaaaa", "aacacccc"))
 }
