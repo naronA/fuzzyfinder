@@ -1,41 +1,41 @@
 package main
 
-func LevenshteinDistance(str1, str2 string) int {
-	rowSize := len(str1) + 1
-	columnSize := len(str2) + 1
-	d := make([][]int, rowSize)
-	for i := 0; i < rowSize; i++ {
-		d[i] = make([]int, columnSize)
-	}
+import "fmt"
 
-	for i := 0; i < rowSize; i++ {
-		d[i][0] = i
-	}
-
-	for j := 0; j < columnSize; j++ {
-		d[0][j] = j
-	}
-
-	for i := 1; i < rowSize; i++ {
-		for j := 1; j < columnSize; j++ {
-			con := func() int {
-				if str1[i-1] == str2[j-1] {
-					return 0
-				}
-				return 1
-			}()
-			x1 := d[i-1][j] + 1
-			x2 := d[i][j-1] + 1
-			x3 := d[i-1][j-1] + con
-			switch {
-			case x1 <= x2 && x1 <= x3:
-				d[i][j] = x1
-			case x2 <= x1 && x2 <= x3:
-				d[i][j] = x2
-			case x3 <= x1 && x3 <= x2:
-				d[i][j] = x3
-			}
+func PrintMat(mat [][]int) {
+	for _, col := range mat {
+		for _, val := range col {
+			fmt.Printf("%d\t", val)
 		}
+		fmt.Println()
+		// fmt.Println(col)
 	}
-	return d[rowSize-1][columnSize-1]
+}
+
+func initNedlemanWunsch(row, column int) [][]int {
+	mat := make([][]int, row)
+	for i := 0; i < row; i++ {
+		mat[i] = make([]int, column)
+	}
+
+	for i := 0; i < row; i++ {
+		mat[i][0] = i * -2
+	}
+
+	for j := 0; j < column; j++ {
+		mat[0][j] = j * -2
+	}
+	return mat
+}
+
+func NeedlemanWunsch(s1, s2 []rune) int {
+	row := len(s1) + 1
+	column := len(s2) + 1
+	mat := initNedlemanWunsch(row, column)
+	PrintMat(mat)
+	return 0
+}
+
+func main() {
+	NeedlemanWunsch([]rune("aaaa"), []rune("bbbb"))
 }
