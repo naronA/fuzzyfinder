@@ -193,7 +193,9 @@ func drawResult(s1, s2 []rune, cmat [][]int) {
 	fmt.Println()
 }
 
-func NeedlemanWunsch(s1, s2 []rune, draw bool) int {
+func NeedlemanWunsch(str1, str2 string, draw bool) int {
+	s1 := []rune(str1)
+	s2 := []rune(str2)
 	n := len(s1) + 1
 	m := len(s2) + 1
 	mat, cmat := initMatrix(n, m)
