@@ -5,8 +5,27 @@ import (
 	"math"
 )
 
-func printPointer(mat [][]int) {
-	for _, col := range mat {
+func printPointer(s1, s2 []rune, mat [][]int) {
+	fmt.Printf("%2s  |", " ")
+	fmt.Printf("%5s", " ")
+	for _, r := range s1 {
+		fmt.Printf("%4c ", r)
+	}
+	fmt.Println()
+
+	fmt.Print("----+")
+	for i := 0; i < len(s1)*5+5; i++ {
+		fmt.Print("-")
+	}
+
+	fmt.Println()
+	for i, col := range mat {
+		if i == 0 {
+			fmt.Printf("%2s  |", " ")
+		} else {
+			fmt.Printf("%2c  |", s2[i-1])
+		}
+
 		for _, val := range col {
 			var token string
 			switch val {
@@ -34,8 +53,27 @@ func printPointer(mat [][]int) {
 	fmt.Println()
 }
 
-func printIntMat(mat [][]int) {
-	for _, col := range mat {
+func printIntMat(s1, s2 []rune, mat [][]int) {
+	fmt.Printf("%2s  |", " ")
+	fmt.Printf("%5s", " ")
+	for _, r := range s1 {
+		fmt.Printf("%4c ", r)
+	}
+	fmt.Println()
+
+	fmt.Print("----+")
+	for i := 0; i < len(s1)*5+5; i++ {
+		fmt.Print("-")
+	}
+
+	fmt.Println()
+	for i, col := range mat {
+		if i == 0 {
+			fmt.Printf("%2s  |", " ")
+		} else {
+			fmt.Printf("%2c  |", s2[i-1])
+		}
+
 		for _, val := range col {
 			fmt.Printf("%4d ", val)
 		}
@@ -211,8 +249,8 @@ func NeedlemanWunsch(str1, str2 string, draw bool) int {
 		}
 	}
 	if draw {
-		printIntMat(mat)
-		printPointer(cmat)
+		printIntMat(s1, s2, mat)
+		printPointer(s1, s2, cmat)
 		drawResult(s1, s2, cmat)
 	}
 	return mat[m-1][n-1]
