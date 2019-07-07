@@ -1,14 +1,14 @@
 import numpy as np
 
 
-def diagonal(n1, n2, pt):
+def diagonal(n1: str, n2: str, pt: dict) -> int:
     if (n1 == n2):
         return pt['MATCH']
     else:
         return pt['MISMATCH']
 
 
-def pointers(di, ho, ve):
+def pointers(di: int, ho: int, ve: int) -> str:
     pointer = max(di, ho, ve)
     if(di == pointer):
         return 'D'
@@ -18,7 +18,7 @@ def pointers(di, ho, ve):
         return 'V'
 
 
-def needleman_wunsch(s1, s2, match=2, mismatch=-1, gap=-2):
+def needleman_wunsch(s1: str, s2: str, match: int = 2, mismatch: int = -1, gap: int = -2):
     penalty = {
         'MATCH': match,
         'MISMATCH': mismatch,

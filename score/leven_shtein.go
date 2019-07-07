@@ -1,6 +1,8 @@
 package score
 
-func LevenshteinDistance(s1, s2 []rune) int {
+func LevenshteinDistance(str1, str2 string) int {
+	s1 := []rune(str1)
+	s2 := []rune(str2)
 	rowSize := len(s1) + 1
 	columnSize := len(s2) + 1
 	d := make([][]int, rowSize)
