@@ -3,9 +3,9 @@ package score
 import "testing"
 
 func TestNeedlemanWunsch01(t *testing.T) {
-	NeedlemanWunsch("ATACABACCCC", "ACBCCCC", true)
+	NeedlemanWunsch("ATACABACCCC", "ACBCCCC")
 }
 
 func TestNeedlemanWunsch02(t *testing.T) {
-	NeedlemanWunsch("AC", "ATAC", true)
+	NeedlemanWunsch("AC", "ATAC")
 }

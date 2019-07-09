@@ -103,14 +103,28 @@ func drawResult(s1, s2 []rune, cmat [][]int) {
 		mid := make([]rune, n)
 		short := make([]rune, n)
 		pos := n - 2
+		shortPos := m - 2
 		for x != 0 || y != 0 {
+			if pos < 0 {
+				break
+			}
+
 			switch cmat[x][y] {
 			case D:
-				x--
-				y--
-				long[pos] = s1[pos]
-				mid[pos] = '|'
-				short[pos] = s1[pos]
+				if s1[pos] == s2[shortPos] {
+					x--
+					y--
+					long[pos] = s1[pos]
+					mid[pos] = '|'
+					short[pos] = s2[shortPos]
+					shortPos--
+				} else {
+					x--
+					y--
+					long[pos] = s1[pos]
+					mid[pos] = ' '
+					short[pos] = '-'
+				}
 			case DHV, DH, HV, H:
 				y--
 				long[pos] = s1[pos]
@@ -132,14 +146,27 @@ func drawResult(s1, s2 []rune, cmat [][]int) {
 	mid := make([]rune, m)
 	short := make([]rune, m)
 	pos := m - 2
+	shortPos := n - 2
 	for x != 0 || y != 0 {
+		if pos < 0 {
+			break
+		}
 		switch cmat[x][y] {
 		case D:
-			x--
-			y--
-			long[pos] = s2[pos]
-			mid[pos] = '|'
-			short[pos] = s2[pos]
+			if s2[pos] == s1[shortPos] {
+				x--
+				y--
+				long[pos] = s2[pos]
+				mid[pos] = '|'
+				short[pos] = s1[shortPos]
+				shortPos--
+			} else {
+				x--
+				y--
+				long[pos] = s2[pos]
+				mid[pos] = ' '
+				short[pos] = '-'
+			}
 		case DH, H:
 			y--
 			long[pos] = s2[pos]
