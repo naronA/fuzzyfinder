@@ -67,7 +67,7 @@ func pointers(di, ho, ve int) int {
 	return V
 }
 
-func NeedlemanWunsch(str1, str2 string) (int, bool) {
+func NeedlemanWunsch(str1, str2 string) (int, []int) {
 	s1 := []rune(str1)
 	s2 := []rune(str2)
 	n := len(s1) + 1
@@ -75,12 +75,8 @@ func NeedlemanWunsch(str1, str2 string) (int, bool) {
 	mat, cmat := initNeedlemanWunsch(n, m)
 	mat[0][0] = 0
 	cmat[0][0] = NONE
-	matched := false
 	for i := 1; i < m; i++ {
 		for j := 1; j < n; j++ {
-			if diagonal(s1[j-1], s2[i-1]) == MatchNW {
-				matched = true
-			}
 			di := mat[i-1][j-1] + diagonal(s1[j-1], s2[i-1])
 			ho := mat[i][j-1] + GapNW
 			ve := mat[i-1][j] + GapNW
@@ -93,5 +89,5 @@ func NeedlemanWunsch(str1, str2 string) (int, bool) {
 		printPointer(s1, s2, cmat)
 		drawResult(s1, s2, cmat)
 	}
-	return mat[m-1][n-1], matched
+	return mat[m-1][n-1], matched(s1, s2, cmat)
 }

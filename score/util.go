@@ -184,3 +184,59 @@ func drawResult(s1, s2 []rune, cmat [][]int) {
 	fmt.Printf("%s\n%s\n%s\n", string(long), string(mid), string(short))
 	fmt.Println()
 }
+
+func matched(s1, s2 []rune, cmat [][]int) []int {
+	n := len(s1) + 1
+	m := len(s2) + 1
+	x := m - 1
+	y := n - 1
+	matchedPos := []int{}
+	if n > m {
+		pos := n - 2
+		shortPos := m - 2
+		for x != 0 || y != 0 {
+			if pos < 0 {
+				break
+			}
+
+			switch cmat[x][y] {
+			case D:
+				x--
+				y--
+				if s1[pos] == s2[shortPos] {
+					matchedPos = append(matchedPos, pos)
+					shortPos--
+				}
+			case DHV, DH, HV, H:
+				y--
+			case DV, V:
+				x--
+			}
+			pos--
+		}
+		return matchedPos
+	}
+	pos := m - 2
+	shortPos := n - 2
+	for x != 0 || y != 0 {
+		if pos < 0 {
+			break
+		}
+		switch cmat[x][y] {
+		case D:
+			x--
+			y--
+			if s2[pos] == s1[shortPos] {
+				matchedPos = append(matchedPos, pos)
+				shortPos--
+			}
+		case DH, H:
+			y--
+		case DHV, HV, DV, V:
+			x--
+		}
+		pos--
+	}
+
+	return matchedPos
+}

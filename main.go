@@ -45,8 +45,8 @@ func main() {
 	finders := Finders{}
 	for _, str := range paths {
 		sc, matched := score.NeedlemanWunsch(str, input)
-		if matched {
-			f := Finder{Score: sc, Str: str}
+		if len(matched) > 0 {
+			f := Finder{Score: sc, Str: str, Pointers: matched}
 			finders = append(finders, f)
 		}
 	}
@@ -55,8 +55,9 @@ func main() {
 }
 
 type Finder struct {
-	Score int
-	Str   string
+	Score    int
+	Str      string
+	Pointers []int
 }
 
 type Finders []Finder
@@ -70,5 +71,22 @@ func (f Finders) Swap(i, j int) {
 }
 
 func (f Finders) Less(i, j int) bool {
-	return f[i].Score < f[j].Score
+	return len(f[i].Pointers) < len(f[j].Pointers) || f[i].Score < f[j].Score
+}
+
+func (f Finder) String() string {
+	highlighted := []rune{}
+	original := []rune(f.Str)
+	sort.Ints(f.Pointers)
+	for i, c := range original {
+		if len(f.Pointers) > 0 && i == f.Pointers[0] {
+			f.Pointers = f.Pointers[1:]
+			highlighted = append(highlighted, '[')
+			highlighted = append(highlighted, c)
+			highlighted = append(highlighted, ']')
+		} else {
+			highlighted = append(highlighted, c)
+		}
+	}
+	return string(highlighted)
 }
