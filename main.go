@@ -81,9 +81,9 @@ func (f Finder) String() string {
 	for i, c := range original {
 		if len(f.Pointers) > 0 && i == f.Pointers[0] {
 			f.Pointers = f.Pointers[1:]
-			highlighted = append(highlighted, '[')
+			highlighted = append(highlighted, []rune("\x1b[38;5;127m")...)
 			highlighted = append(highlighted, c)
-			highlighted = append(highlighted, ']')
+			highlighted = append(highlighted, []rune("\x1b[0m")...)
 		} else {
 			highlighted = append(highlighted, c)
 		}
