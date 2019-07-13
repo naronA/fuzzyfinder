@@ -204,6 +204,7 @@ func matched(s1, s2 []rune, cmat [][]int) []int {
 				x--
 				y--
 				if s1[pos] == s2[shortPos] {
+					// fmt.Println(string(s1), string(s2), string(s1[pos]), string(s2[shortPos]), pos, shortPos)
 					matchedPos = append(matchedPos, pos)
 					shortPos--
 				}
@@ -214,6 +215,7 @@ func matched(s1, s2 []rune, cmat [][]int) []int {
 			}
 			pos--
 		}
+
 		return matchedPos
 	}
 	pos := m - 2
@@ -227,7 +229,8 @@ func matched(s1, s2 []rune, cmat [][]int) []int {
 			x--
 			y--
 			if s2[pos] == s1[shortPos] {
-				matchedPos = append(matchedPos, pos)
+				// fmt.Println(string(s1), string(s2), string(s2[pos]), string(s1[shortPos]), pos, shortPos)
+				matchedPos = append(matchedPos, shortPos)
 				shortPos--
 			}
 		case DH, H:

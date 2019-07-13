@@ -77,18 +77,19 @@ func (f Finders) Less(i, j int) bool {
 }
 
 func (f Finder) String() string {
-	highlighted := []rune{}
+	highligh := []rune{}
 	original := []rune(f.Str)
+	pt := f.Pointers
 	sort.Ints(f.Pointers)
 	for i, c := range original {
-		if len(f.Pointers) > 0 && i == f.Pointers[0] {
-			f.Pointers = f.Pointers[1:]
-			highlighted = append(highlighted, []rune("\x1b[38;5;198m")...)
-			highlighted = append(highlighted, c)
-			highlighted = append(highlighted, []rune("\x1b[0m")...)
+		if len(pt) > 0 && i == pt[0] {
+			pt = pt[1:]
+			highligh = append(highligh, []rune("\x1b[38;5;198m")...)
+			highligh = append(highligh, c)
+			highligh = append(highligh, []rune("\x1b[0m")...)
 		} else {
-			highlighted = append(highlighted, c)
+			highligh = append(highligh, c)
 		}
 	}
-	return string(highlighted)
+	return string(highligh)
 }
