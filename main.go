@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
+	"sync"
 
 	"github.com/naronA/fuzzyfinder/score"
 )
@@ -19,7 +19,8 @@ func main() {
 
 	input := args[0]
 
-	finders := score.Finders{}
+	// finders := score.Finders{}
+	wg := &sync.WaitGroup{}
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -32,19 +33,25 @@ func main() {
 			}
 		}
 		if info.Name() != "." {
-			if strings.Contains(path, input) {
-				sc := score.NeedlemanWunsch(path, input)
-				f := score.Finder{Score: sc, Source: path, Input: input}
-				finders = append(finders, f)
-			}
+			wg.Add(1)
+			go func() {
+				if strings.Contains(path, input) {
+					sc := score.NeedlemanWunsch(path, input)
+					f := score.Finder{Score: sc, Source: path, Input: input}
+					fmt.Println(f)
+					// finders = append(finders, f)
+				}
+				wg.Done()
+			}()
 		}
 		return nil
 	})
 	if err != nil {
 		log.Println(err)
 	}
-	sort.Sort(sort.Reverse(finders))
-	for _, f := range finders {
-		fmt.Println(f)
-	}
+	wg.Wait()
+	// sort.Sort(sort.Reverse(finders))
+	// for _, f := range finders {
+	// 	fmt.Println(f)
+	// }
 }

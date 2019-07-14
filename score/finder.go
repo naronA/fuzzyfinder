@@ -8,20 +8,6 @@ type Finder struct {
 	Input  string
 }
 
-type Finders []Finder
-
-func (f Finders) Len() int {
-	return len(f)
-}
-
-func (f Finders) Swap(i, j int) {
-	f[i], f[j] = f[j], f[i]
-}
-
-func (f Finders) Less(i, j int) bool {
-	return f[i].Score < f[j].Score
-}
-
 func (f Finder) String() string {
 	index := strings.Index(f.Source, f.Input)
 	if index == -1 {
@@ -38,4 +24,18 @@ func (f Finder) String() string {
 	highligh = append(highligh, []rune(hEnd)...)
 	highligh = append(highligh, source[index+len(input):]...)
 	return string(highligh)
+}
+
+type Finders []Finder
+
+func (f Finders) Len() int {
+	return len(f)
+}
+
+func (f Finders) Swap(i, j int) {
+	f[i], f[j] = f[j], f[i]
+}
+
+func (f Finders) Less(i, j int) bool {
+	return f[i].Score < f[j].Score
 }
