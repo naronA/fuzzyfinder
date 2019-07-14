@@ -1,25 +1,22 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/naronA/fuzzyfinder/score"
 )
 
 func main() {
-	// gui.Gui()
-	// files, err := ioutil.ReadDir(".")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// for _, f := range files {
-	// 	fmt.Println(f.Name())
-	// }
+	flag.Parse()
+	args := flag.Args()
 
+	input := args[0]
 	paths := []string{}
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
@@ -41,12 +38,11 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-	input := "util"
 	finders := Finders{}
-	for _, str := range paths {
-		sc, matched := score.NeedlemanWunsch(str, input)
-		if len(matched) > 0 {
-			f := Finder{Score: sc, Str: str, Pointers: matched}
+	for _, src := range paths {
+		sc := score.NeedlemanWunsch(src, input)
+		if strings.Contains(src, input) {
+			f := Finder{Score: sc, Source: src, Input: input}
 			finders = append(finders, f)
 		}
 	}
@@ -57,9 +53,9 @@ func main() {
 }
 
 type Finder struct {
-	Score    int
-	Str      string
-	Pointers []int
+	Score  int
+	Source string
+	Input  string
 }
 
 type Finders []Finder
@@ -73,23 +69,24 @@ func (f Finders) Swap(i, j int) {
 }
 
 func (f Finders) Less(i, j int) bool {
-	return len(f[i].Pointers) < len(f[j].Pointers) || f[i].Score < f[j].Score
+	// return len(f[i].Pointers) < len(f[j].Pointers) || f[i].Score < f[j].Score
+	return f[i].Score < f[j].Score
 }
 
 func (f Finder) String() string {
 	highligh := []rune{}
-	original := []rune(f.Str)
-	pt := f.Pointers
-	sort.Ints(f.Pointers)
-	for i, c := range original {
-		if len(pt) > 0 && i == pt[0] {
-			pt = pt[1:]
+	source := []rune(f.Source)
+	input := []rune(f.Input)
+	index := strings.Index(f.Source, f.Input)
+	for i, c := range source {
+		if i == index {
 			highligh = append(highligh, []rune("\x1b[38;5;198m")...)
-			highligh = append(highligh, c)
-			highligh = append(highligh, []rune("\x1b[0m")...)
-		} else {
-			highligh = append(highligh, c)
 		}
+		highligh = append(highligh, c)
+		if i == index+len(input)-1 {
+			highligh = append(highligh, []rune("\x1b[0m")...)
+		}
+
 	}
 	return string(highligh)
 }

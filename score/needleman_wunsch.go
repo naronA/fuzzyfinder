@@ -1,6 +1,8 @@
 package score
 
-import "math"
+import (
+	"math"
+)
 
 const (
 	DEBUG      = false
@@ -67,7 +69,7 @@ func pointers(di, ho, ve int) int {
 	return V
 }
 
-func NeedlemanWunsch(str1, str2 string) (int, []int) {
+func NeedlemanWunsch(str1, str2 string) int {
 	s1 := []rune(str1)
 	s2 := []rune(str2)
 	n := len(s1) + 1
@@ -89,5 +91,6 @@ func NeedlemanWunsch(str1, str2 string) (int, []int) {
 		printPointer(s1, s2, cmat)
 		drawResult(s1, s2, cmat)
 	}
-	return mat[m-1][n-1], matched(s1, s2, cmat)
+
+	return mat[m-1][n-1]
 }
