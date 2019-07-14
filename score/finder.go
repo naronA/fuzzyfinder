@@ -1,29 +1,54 @@
 package score
 
-import "strings"
+import (
+	"strings"
+)
 
 type Finder struct {
-	Score  int
 	Source string
-	Input  string
+	Inputs []string
+}
+
+func (f Finder) Score() int {
+	var sc int
+	for _, input := range f.Inputs {
+		sc += CalcScore(f.Source, input)
+	}
+	return sc
 }
 
 func (f Finder) String() string {
-	index := strings.Index(f.Source, f.Input)
-	if index == -1 {
-		return f.Source
-	}
 	hBegin := "\x1b[38;5;198m"
 	hEnd := "\x1b[0m"
-	source := []rune(f.Source)
-	input := []rune(f.Input)
-	highligh := make([]rune, 0, len(hBegin)+len(hEnd)+len(source))
-	highligh = append(highligh, source[:index]...)
-	highligh = append(highligh, []rune(hBegin)...)
-	highligh = append(highligh, source[index:index+len(input)]...)
-	highligh = append(highligh, []rune(hEnd)...)
-	highligh = append(highligh, source[index+len(input):]...)
-	return string(highligh)
+	highligh := []rune(f.Source)
+	for _, input := range f.Inputs {
+		point := strings.Index(string(highligh), input)
+		head := highligh[:point]
+		term := highligh[point : point+len(input)]
+		tail := highligh[point+len(input):]
+
+		highligh = make([]rune, 0, len(highligh)+2)
+		highligh = append(highligh, head...)
+		highligh = append(highligh, '\t')
+		highligh = append(highligh, term...)
+		highligh = append(highligh, '\v')
+		highligh = append(highligh, tail...)
+	}
+
+	result := string(highligh)
+	for strings.Contains(result, "\t") || strings.Contains(result, "\v") {
+		result = strings.Replace(result, "\t", hBegin, 1)
+
+		// タグが入れ子になっていたら入れ子の部分を削除する
+		// \t ab \t cA \v BC \v  => \t ab cA BC \v
+		for strings.Contains(result, "\t") && strings.Index(result, "\t") < strings.Index(result, "\v") {
+			result = strings.Replace(result, "\t", "", 1)
+			result = strings.Replace(result, "\v", "", 1)
+		}
+
+		result = strings.Replace(result, "\v", hEnd, 1)
+	}
+	return result
 }
 
 type Finders []Finder
@@ -37,5 +62,5 @@ func (f Finders) Swap(i, j int) {
 }
 
 func (f Finders) Less(i, j int) bool {
-	return f[i].Score < f[j].Score
+	return f[i].Score() < f[j].Score()
 }

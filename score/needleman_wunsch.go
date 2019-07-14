@@ -2,13 +2,14 @@ package score
 
 import (
 	"math"
+
+	"github.com/naronA/fuzzyfinder/config"
 )
 
 const (
-	DEBUG      = false
-	GapNW      = -2
-	MatchNW    = 6
-	MismatchNW = -1
+	nwGAP      = -2
+	nwMATCH    = 2
+	nwMISMATCH = -1
 )
 
 func initNeedlemanWunsch(n, m int) ([][]int, [][]int) {
@@ -43,9 +44,9 @@ func max(x ...int) int {
 
 func diagonal(n1, n2 rune) int {
 	if n1 == n2 {
-		return MatchNW
+		return nwMATCH
 	}
-	return MismatchNW
+	return nwMISMATCH
 }
 
 func pointers(di, ho, ve int) int {
@@ -80,13 +81,13 @@ func NeedlemanWunsch(str1, str2 string) int {
 	for i := 1; i < m; i++ {
 		for j := 1; j < n; j++ {
 			di := mat[i-1][j-1] + diagonal(s1[j-1], s2[i-1])
-			ho := mat[i][j-1] + GapNW
-			ve := mat[i-1][j] + GapNW
+			ho := mat[i][j-1] + nwGAP
+			ve := mat[i-1][j] + nwGAP
 			mat[i][j] = max(di, ho, ve)
 			cmat[i][j] = pointers(di, ho, ve)
 		}
 	}
-	if DEBUG {
+	if config.DEBUG {
 		printIntMat(s1, s2, mat)
 		printPointer(s1, s2, cmat)
 		drawResult(s1, s2, cmat)
