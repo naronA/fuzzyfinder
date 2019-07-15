@@ -2,6 +2,7 @@ package score
 
 import (
 	"fmt"
+	"strings"
 )
 
 const (
@@ -240,4 +241,37 @@ func matched(s1, s2 []rune, cmat [][]int) []int {
 	}
 
 	return matchedPos
+}
+
+func sum(nums []int) int {
+	total := 0
+	for _, val := range nums {
+		total += val
+	}
+	return total
+}
+
+func last(nums []int) int {
+	last := 0
+	for _, val := range nums {
+		last = val
+	}
+	return last
+}
+func IndicesAll(src, substr string) []int {
+	indices := []int{}
+
+	slice := []rune(src)
+	for i := 0; strings.Contains(string(slice), substr); i++ {
+		idx := strings.Index(string(slice), substr)
+		slice = slice[idx+len(substr):]
+		newIdx := func() int {
+			if i >= 1 {
+				return idx + last(indices) + len(substr)
+			}
+			return idx + last(indices)
+		}()
+		indices = append(indices, newIdx)
+	}
+	return indices
 }

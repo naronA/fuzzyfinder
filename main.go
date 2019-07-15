@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -26,8 +25,8 @@ func main() {
 	}
 	flag.Parse()
 	args := flag.Args()
-
 	finders := score.Finders{}
+
 	wg := &sync.WaitGroup{}
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -42,17 +41,16 @@ func main() {
 		}
 		if info.Name() != "." {
 			wg.Add(1)
-			go func() {
+			func(path string) {
+				defer wg.Done()
 				for _, input := range args {
 					if !strings.Contains(path, input) {
-						wg.Done()
 						return
 					}
 				}
 				f := score.Finder{Source: path, Inputs: args}
 				finders = append(finders, f)
-				wg.Done()
-			}()
+			}(path)
 		}
 		return nil
 	})
@@ -60,7 +58,6 @@ func main() {
 		log.Println(err)
 	}
 	wg.Wait()
-	sort.Sort(sort.Reverse(finders))
 	for _, f := range finders {
 		fmt.Println(f)
 	}
