@@ -26,10 +26,11 @@ func overlap(start, end int, m Range) bool {
 }
 
 func mergeRange(matches Ranges, newR *Range) Ranges {
-	newRanges := Ranges{}
 	if len(matches) == 0 {
 		return Ranges{newR}
 	}
+
+	newRanges := Ranges{}
 	for _, m := range matches {
 		if newR.Start >= m.Start && m.End >= newR.End {
 			// m    |----------|
