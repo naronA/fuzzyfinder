@@ -4,7 +4,7 @@ import (
 	"github.com/naronA/fuzzyfinder/config"
 )
 
-func CalcScore(path, input string) int {
+func CalcScore(path, input string) (int, []int) {
 	switch config.SCORE {
 	case "NeedlemanWunsch":
 		return NeedlemanWunsch(path, input)

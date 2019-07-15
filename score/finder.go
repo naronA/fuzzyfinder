@@ -4,25 +4,6 @@ import (
 	"sort"
 )
 
-type Range struct {
-	Start int
-	End   int
-}
-
-type Ranges []*Range
-
-func (r Ranges) Len() int {
-	return len(r)
-}
-
-func (r Ranges) Swap(i, j int) {
-	r[i], r[j] = r[j], r[i]
-}
-
-func (r Ranges) Less(i, j int) bool {
-	return r[i].Start < r[j].Start
-}
-
 type Finder struct {
 	Source string
 	Inputs []string
@@ -31,7 +12,8 @@ type Finder struct {
 func (f Finder) Score() int {
 	var sc int
 	for _, input := range f.Inputs {
-		sc += CalcScore(f.Source, input)
+		score, _ := CalcScore(f.Source, input)
+		sc += score
 	}
 	return sc
 }
@@ -43,31 +25,45 @@ func overlap(start, end int, m Range) bool {
 	return false
 }
 
+func mergeRange(matches Ranges, newR *Range) Ranges {
+	newRanges := Ranges{}
+	if len(matches) == 0 {
+		return Ranges{newR}
+	}
+	for _, m := range matches {
+		if newR.Start >= m.Start && m.End >= newR.End {
+			// m    |----------|
+			// newR    |----|
+			newR.Start = m.Start
+			newR.End = m.End
+		} else if newR.Start <= m.Start && m.Start <= newR.End && m.End >= newR.End {
+			// m       |-------|
+			// newR |-----|
+			newR.End = m.End
+		} else if m.Start <= newR.Start && newR.Start <= m.End && m.End <= newR.End {
+			// m     |-------|
+			// newR       |------|
+			newR.Start = m.Start
+		} else if newR.Start <= m.Start && m.Start <= newR.End && newR.Start <= m.End && m.End <= newR.End {
+			// m           |-------|
+			// newR |---------------|
+			// do nothing
+		} else {
+			newRanges = append(newRanges, m)
+		}
+	}
+	newRanges = append(newRanges, newR)
+	return newRanges
+}
+
 func (f Finder) Matches() Ranges {
 	matches := Ranges{}
 	for _, input := range f.Inputs {
 		starts := IndicesAll(f.Source, input)
 		for _, start := range starts {
 			end := start + len(input)
-			isOverlap := false
-			for _, m := range matches {
-				if m.Start <= start && start <= m.End && end > m.End {
-					isOverlap = true
-					m.End = end
-					break
-				} else if start < m.Start && m.Start <= end && end <= m.End {
-					isOverlap = true
-					m.Start = start
-					break
-				} else if m.Start <= start && start <= m.End && m.Start <= end && end <= m.End {
-					isOverlap = true
-					break
-				}
-			}
-			if isOverlap == false {
-				m := &Range{Start: start, End: end}
-				matches = append(matches, m)
-			}
+			m := &Range{Start: start, End: end}
+			matches = mergeRange(matches, m)
 		}
 	}
 	sort.Sort(matches)

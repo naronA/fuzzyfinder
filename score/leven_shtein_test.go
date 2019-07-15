@@ -12,7 +12,7 @@ type ArgResult struct {
 }
 
 func TestLevenshteinDistance0(t *testing.T) {
-	actual := LevenshteinDistance("aaaaa", "aaaaa")
+	actual, _ := LevenshteinDistance("aaaaa", "aaaaa")
 	expected := 0
 	if expected != actual {
 		fmt.Println(expected, actual)
@@ -21,7 +21,7 @@ func TestLevenshteinDistance0(t *testing.T) {
 }
 
 func TestLevenshteinDistance1(t *testing.T) {
-	actual := LevenshteinDistance("aaaaa", "baaaa")
+	actual, _ := LevenshteinDistance("aaaaa", "baaaa")
 	expected := 1
 	if expected != actual {
 		fmt.Println(expected, actual)
@@ -30,7 +30,7 @@ func TestLevenshteinDistance1(t *testing.T) {
 }
 
 func TestLevenshteinDistance2(t *testing.T) {
-	actual := LevenshteinDistance("aaaaa", "baaba")
+	actual, _ := LevenshteinDistance("aaaaa", "baaba")
 	expected := 2
 	if expected != actual {
 		fmt.Println(expected, actual)
@@ -39,7 +39,7 @@ func TestLevenshteinDistance2(t *testing.T) {
 }
 
 func TestLevenshteinDistanceDifferenceLength(t *testing.T) {
-	actual := LevenshteinDistance("aaaaa", "aaaaabbb")
+	actual, _ := LevenshteinDistance("aaaaa", "aaaaabbb")
 	expected := 3
 	if expected != actual {
 		fmt.Println(expected, actual)

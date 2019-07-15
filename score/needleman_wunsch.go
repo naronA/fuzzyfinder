@@ -70,7 +70,7 @@ func pointers(di, ho, ve int) int {
 	return V
 }
 
-func NeedlemanWunsch(str1, str2 string) int {
+func NeedlemanWunsch(str1, str2 string) (int, []int) {
 	s1 := []rune(str1)
 	s2 := []rune(str2)
 	n := len(s1) + 1
@@ -93,5 +93,5 @@ func NeedlemanWunsch(str1, str2 string) int {
 		drawResult(s1, s2, cmat)
 	}
 
-	return mat[m-1][n-1]
+	return mat[m-1][n-1], matched(s1, s2, cmat)
 }
