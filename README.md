@@ -1,1 +1,5 @@
 # fuzzyfinder
+
+お手製fuzzyfinder
+カレントディレクトリをfindしてマッチした箇所をハイライトする
+類似度のスコア計算には、お試しで NeedlemanWunschを使用
