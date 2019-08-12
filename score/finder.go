@@ -4,6 +4,68 @@ import (
 	"sort"
 )
 
+type Range struct {
+	Start int
+	End   int
+}
+
+type Ranges []*Range
+
+func (r Ranges) Len() int {
+	return len(r)
+}
+
+func (r Ranges) Swap(i, j int) {
+	r[i], r[j] = r[j], r[i]
+}
+
+func (r Ranges) Less(i, j int) bool {
+	return r[i].Start < r[j].Start
+}
+
+func overlap(start, end int, m Range) bool {
+	if m.Start < start && start < m.End && end >= m.End {
+		return true
+	}
+	return false
+}
+
+func merge(r Ranges, newR *Range) Ranges {
+	if len(r) == 0 {
+		return Ranges{newR}
+	}
+
+	newRanges := Ranges{}
+	for _, m := range r {
+		switch {
+		case newR.Start >= m.Start && m.End >= newR.End:
+			// m       |----------|
+			// newR       |----|
+			// Result  |----------|
+			newR.Start = m.Start
+			newR.End = m.End
+		case newR.Start <= m.Start && m.Start <= newR.End && m.End >= newR.End:
+			// m           |-------|
+			// newR    |-----|
+			// Result  |----------|
+			newR.End = m.End
+		case m.Start <= newR.Start && newR.Start <= m.End && m.End <= newR.End:
+			// m       |------|
+			// newR        |------|
+			// Result  |----------|
+			newR.Start = m.Start
+		case newR.Start <= m.Start && m.Start <= newR.End && newR.Start <= m.End && m.End <= newR.End:
+			// m           |-------|
+			// newR    |---------------|
+			// Result  |---------------| do nothing
+		default:
+			newRanges = append(newRanges, m)
+		}
+	}
+	newRanges = append(newRanges, newR)
+	return newRanges
+}
+
 type Finder struct {
 	Source string
 	Inputs []string
@@ -18,53 +80,15 @@ func (f Finder) Score() int {
 	return sc
 }
 
-func overlap(start, end int, m Range) bool {
-	if m.Start < start && start < m.End && end >= m.End {
-		return true
-	}
-	return false
-}
-
-func mergeRange(matches Ranges, newR *Range) Ranges {
-	if len(matches) == 0 {
-		return Ranges{newR}
-	}
-
-	newRanges := Ranges{}
-	for _, m := range matches {
-		if newR.Start >= m.Start && m.End >= newR.End {
-			// m    |----------|
-			// newR    |----|
-			newR.Start = m.Start
-			newR.End = m.End
-		} else if newR.Start <= m.Start && m.Start <= newR.End && m.End >= newR.End {
-			// m       |-------|
-			// newR |-----|
-			newR.End = m.End
-		} else if m.Start <= newR.Start && newR.Start <= m.End && m.End <= newR.End {
-			// m     |-------|
-			// newR       |------|
-			newR.Start = m.Start
-		} else if newR.Start <= m.Start && m.Start <= newR.End && newR.Start <= m.End && m.End <= newR.End {
-			// m           |-------|
-			// newR |---------------|
-			// do nothing
-		} else {
-			newRanges = append(newRanges, m)
-		}
-	}
-	newRanges = append(newRanges, newR)
-	return newRanges
-}
-
 func (f Finder) Matches() Ranges {
 	matches := Ranges{}
 	for _, input := range f.Inputs {
 		starts := IndicesAll(f.Source, input)
 		for _, start := range starts {
 			end := start + len(input)
-			m := &Range{Start: start, End: end}
-			matches = mergeRange(matches, m)
+			r := &Range{Start: start, End: end}
+			matches = merge(matches, r)
+			// matches = mergeRange(matches, m)
 		}
 	}
 	sort.Sort(matches)
@@ -74,22 +98,47 @@ func (f Finder) Matches() Ranges {
 func (f Finder) String() string {
 	hBegin := []rune("\x1b[38;5;198m")
 	hEnd := []rune("\x1b[0m")
-	highligh := []rune(f.Source)
+	source := []rune(f.Source)
+	headStart := 0
+	matches := f.Matches()
+	highlighted := make([]rune, 0, len(source)+len(matches)*(len(hBegin)+len(hEnd)))
+	for i, m := range matches {
+		head := source[headStart:m.Start]
+		term := source[m.Start:m.End]
+		highlighted = append(highlighted, head...)
+		highlighted = append(highlighted, hBegin...)
+		highlighted = append(highlighted, term...)
+		highlighted = append(highlighted, hEnd...)
+
+		if i+1 < len(matches) {
+			headStart = m.End
+		} else {
+			tail := source[m.End:]
+			highlighted = append(highlighted, tail...)
+		}
+	}
+	return string(highlighted)
+}
+
+func (f Finder) StringOld() string {
+	hBegin := []rune("\x1b[38;5;198m")
+	hEnd := []rune("\x1b[0m")
+	hi := []rune(f.Source)
 	for i, m := range f.Matches() {
 		gap := i * (len(hBegin) + len(hEnd))
-		head := highligh[:m.Start+gap]
-		term := highligh[m.Start+gap : m.End+gap]
-		tail := highligh[m.End+gap:]
+		head := hi[:m.Start+gap]
+		term := hi[m.Start+gap : m.End+gap]
+		tail := hi[m.End+gap:]
 
-		highligh = make([]rune, 0, len(highligh)+(len(hBegin)+len(hEnd)))
-		highligh = append(highligh, head...)
-		highligh = append(highligh, hBegin...)
-		highligh = append(highligh, term...)
-		highligh = append(highligh, hEnd...)
-		highligh = append(highligh, tail...)
+		hi = make([]rune, 0, len(hi)+(len(hBegin)+len(hEnd)))
+		hi = append(hi, head...)
+		hi = append(hi, hBegin...)
+		hi = append(hi, term...)
+		hi = append(hi, hEnd...)
+		hi = append(hi, tail...)
 	}
 
-	return string(highligh)
+	return string(hi)
 }
 
 type Finders []Finder
