@@ -95,6 +95,7 @@ func (f Finder) Matches() Ranges {
 	return matches
 }
 
+// マッチした文字列をハイライトするために、対象文字の前後に制御文字を埋め込む
 func (f Finder) String() string {
 	hBegin := []rune("\x1b[38;5;198m")
 	hEnd := []rune("\x1b[0m")
@@ -118,27 +119,6 @@ func (f Finder) String() string {
 		}
 	}
 	return string(highlighted)
-}
-
-func (f Finder) StringOld() string {
-	hBegin := []rune("\x1b[38;5;198m")
-	hEnd := []rune("\x1b[0m")
-	hi := []rune(f.Source)
-	for i, m := range f.Matches() {
-		gap := i * (len(hBegin) + len(hEnd))
-		head := hi[:m.Start+gap]
-		term := hi[m.Start+gap : m.End+gap]
-		tail := hi[m.End+gap:]
-
-		hi = make([]rune, 0, len(hi)+(len(hBegin)+len(hEnd)))
-		hi = append(hi, head...)
-		hi = append(hi, hBegin...)
-		hi = append(hi, term...)
-		hi = append(hi, hEnd...)
-		hi = append(hi, tail...)
-	}
-
-	return string(hi)
 }
 
 type Finders []Finder
