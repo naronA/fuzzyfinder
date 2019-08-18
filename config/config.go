@@ -2,5 +2,6 @@ package config
 
 const (
 	DEBUG = false
-	SCORE = "NeedlemanWunsch"
+	// SCORE = "NeedlemanWunsch"
+	SCORE = "SmithWaterman"
 )

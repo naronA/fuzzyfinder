@@ -1,66 +1,40 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"strings"
-	"sync"
-	"time"
+	"net/http"
 
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/naronA/fuzzyfinder/address"
 	"github.com/naronA/fuzzyfinder/score"
 )
 
-func main() {
-	start := time.Now()
-	ignore := []string{
-		// ".git",
-		// ".mypy_cache",
-		// ".vscode",
-		// ".idea",
-		// "node_modules",
-		// "vendor",
+func findAddress(addresses []string) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		term := c.QueryParams()["term"]
+		finders := make([]score.Finder, 0)
+		for _, add := range addresses {
+			f := score.Finder{Source: add, Inputs: term}
+			finders = append(finders, f)
+		}
+		output := ""
+		for _, f := range finders {
+			output += f.String() + "\n"
+		}
+		return c.String(http.StatusOK, output)
 	}
-	flag.Parse()
-	args := flag.Args()
-	finders := score.Finders{}
+}
 
-	wg := &sync.WaitGroup{}
-	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			for _, dir := range ignore {
-				if info.Name() == dir {
-					return filepath.SkipDir
-				}
-			}
-		}
-		if info.Name() != "." {
-			wg.Add(1)
-			func(path string) {
-				defer wg.Done()
-				for _, input := range args {
-					if !strings.Contains(path, input) {
-						return
-					}
-				}
-				f := score.Finder{Source: path, Inputs: args}
-				finders = append(finders, f)
-			}(path)
-		}
-		return nil
-	})
+func main() {
+	addresses := address.Load()
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
+	e.GET("/address", findAddress(addresses))
+
+	err := e.Start(":1234")
 	if err != nil {
-		log.Println(err)
+		panic(err)
 	}
-	wg.Wait()
-	for _, f := range finders {
-		fmt.Println(f)
-	}
-	end := time.Now()
-	fmt.Println(end.Sub(start))
 }

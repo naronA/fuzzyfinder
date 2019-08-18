@@ -2,6 +2,7 @@ package score
 
 import (
 	"sort"
+	"unicode/utf8"
 )
 
 type Range struct {
@@ -74,7 +75,10 @@ type Finder struct {
 func (f Finder) Score() int {
 	var sc int
 	for _, input := range f.Inputs {
-		score, _ := CalcScore(f.Source, input)
+		score := CalcScore(f.Source, input)
+		// if score == 0 {
+		// 	return 0
+		// }
 		sc += score
 	}
 	return sc
@@ -85,7 +89,7 @@ func (f Finder) Matches() Ranges {
 	for _, input := range f.Inputs {
 		starts := IndicesAll(f.Source, input)
 		for _, start := range starts {
-			end := start + len(input)
+			end := start + utf8.RuneCountInString(input)
 			r := &Range{Start: start, End: end}
 			matches = merge(matches, r)
 			// matches = mergeRange(matches, m)
@@ -95,10 +99,15 @@ func (f Finder) Matches() Ranges {
 	return matches
 }
 
-// マッチした文字列をハイライトするために、対象文字の前後に制御文字を埋め込む
 func (f Finder) String() string {
+	return f.Source
+}
+
+// マッチした文字列をハイライトするために、対象文字の前後に制御文字を埋め込む
+func (f Finder) Highlight() string {
 	hBegin := []rune("\x1b[38;5;198m")
 	hEnd := []rune("\x1b[0m")
+
 	source := []rune(f.Source)
 	headStart := 0
 	matches := f.Matches()

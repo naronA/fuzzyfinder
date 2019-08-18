@@ -2,6 +2,7 @@ package score
 
 import (
 	"strings"
+	"unicode/utf8"
 )
 
 const (
@@ -94,12 +95,14 @@ func IndicesAll(src, substr string) []int {
 	slice := []rune(src)
 	for i := 0; strings.Contains(string(slice), substr); i++ {
 		idx := strings.Index(string(slice), substr)
-		slice = slice[idx+len(substr):]
+		count := utf8.RuneCountInString(string(slice)[:idx])
+		substrCount := utf8.RuneCountInString(substr)
+		slice = slice[count+substrCount:]
 		newIdx := func() int {
 			if i >= 1 {
-				return idx + last(indices) + len(substr)
+				return count + last(indices) + substrCount
 			}
-			return idx + last(indices)
+			return count + last(indices)
 		}()
 		indices = append(indices, newIdx)
 	}

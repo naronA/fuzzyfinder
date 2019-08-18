@@ -1,3 +1,4 @@
 {
-    "python.linting.pylintEnabled": true
+    "python.linting.pylintEnabled": true,
+    "python.pythonPath": "/home/narona/.local/share/virtualenvs/fuzzyfinder-USo7h--a/bin/python"
 }

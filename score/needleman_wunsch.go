@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	nwGAP      = -2
-	nwMATCH    = 2
-	nwMISMATCH = -1
+	GAP      = 2
+	MATCH    = 2
+	MISMATCH = -1
 )
 
 func initNeedlemanWunsch(n, m int) ([][]int, [][]int) {
@@ -44,14 +44,16 @@ func max(x ...int) int {
 
 func diagonal(n1, n2 rune) int {
 	if n1 == n2 {
-		return nwMATCH
+		return MATCH
 	}
-	return nwMISMATCH
+	return MISMATCH
 }
 
 func pointers(di, ho, ve int) int {
-	pointer := max(di, ho, ve)
+	pointer := max(di, ho, ve, 0)
 	switch {
+	case pointer == 0:
+		return DHV
 	case di == pointer && ho == pointer && ve == pointer:
 		return DHV
 	case di == pointer && ho == pointer:
@@ -70,7 +72,7 @@ func pointers(di, ho, ve int) int {
 	return V
 }
 
-func NeedlemanWunsch(str1, str2 string) (int, []int) {
+func NeedlemanWunsch(str1, str2 string) int {
 	s1 := []rune(str1)
 	s2 := []rune(str2)
 	n := len(s1) + 1
@@ -81,8 +83,8 @@ func NeedlemanWunsch(str1, str2 string) (int, []int) {
 	for i := 1; i < m; i++ {
 		for j := 1; j < n; j++ {
 			di := mat[i-1][j-1] + diagonal(s1[j-1], s2[i-1])
-			ho := mat[i][j-1] + nwGAP
-			ve := mat[i-1][j] + nwGAP
+			ho := mat[i][j-1] - GAP
+			ve := mat[i-1][j] - GAP
 			mat[i][j] = max(di, ho, ve)
 			cmat[i][j] = pointers(di, ho, ve)
 		}
@@ -93,5 +95,6 @@ func NeedlemanWunsch(str1, str2 string) (int, []int) {
 		drawResult(s1, s2, cmat)
 	}
 
-	return mat[m-1][n-1], matched(s1, s2, cmat)
+	return mat[m-1][n-1]
+	//, matched(s1, s2, cmat)
 }
