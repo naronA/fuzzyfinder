@@ -37,8 +37,8 @@ func SmithWaterman(str1, str2 string) int {
 	for i := 1; i < m; i++ {
 		for j := 1; j < n; j++ {
 			di := mat[i-1][j-1] + diagonal(s1[j-1], s2[i-1])
-			ho := mat[i][j-1] - GAP
-			ve := mat[i-1][j] - GAP
+			ho := mat[i][j-1] - config.GAP
+			ve := mat[i-1][j] - config.GAP
 			mat[i][j] = max(ho, ve, di, 0)
 			score = max(score, mat[i][j])
 			// cmat[i][j] = pointers(di, ho, ve)
@@ -50,7 +50,7 @@ func SmithWaterman(str1, str2 string) int {
 		drawResult(s1, s2, cmat)
 	}
 	if strings.Contains(str1, str2) {
-		score += MATCH
+		score += config.MATCH
 	}
 
 	return score

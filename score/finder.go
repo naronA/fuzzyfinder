@@ -3,6 +3,8 @@ package score
 import (
 	"sort"
 	"unicode/utf8"
+
+	"github.com/naronA/fuzzyfinder/config"
 )
 
 type Range struct {
@@ -105,8 +107,8 @@ func (f Finder) String() string {
 
 // マッチした文字列をハイライトするために、対象文字の前後に制御文字を埋め込む
 func (f Finder) Highlight() string {
-	hBegin := []rune("\x1b[38;5;198m")
-	hEnd := []rune("\x1b[0m")
+	hBegin := []rune(config.HighlightBegin)
+	hEnd := []rune(config.HighlightEnd)
 
 	source := []rune(f.Source)
 	headStart := 0

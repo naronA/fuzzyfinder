@@ -83,13 +83,13 @@ func main() {
 	addresses := load()
 	finders := make(score.Finders, 0)
 	for _, add := range addresses {
-		f := score.Finder{Source: add, Inputs: []string{"東京", "東日暮里"}}
+		f := score.Finder{Source: add, Inputs: []string{"本郷"}}
 		if f.Score() >= 1 {
 			finders = append(finders, f)
 		}
 	}
 	sort.Sort(sort.Reverse(finders))
-	for _, f := range finders[:20] {
+	for _, f := range finders[:30] {
 		if f.String() != "" {
 			fmt.Printf("%v : %v\n", f.Highlight(), f.Score())
 		}
